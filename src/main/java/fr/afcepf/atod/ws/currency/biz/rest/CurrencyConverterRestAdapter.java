@@ -63,7 +63,9 @@ public class CurrencyConverterRestAdapter
     @Consumes("application/json")
     @Path("/convert/{paramAmount}/{paramSrcCurrency}/{paramTrgtCurrency}")
     @Override
-    public Double convert(Double paramAmount, String paramSrcCurrency, String paramTrgtCurrency)
+    public Double convert(Double paramAmount,
+            String paramSrcCurrency,
+            String paramTrgtCurrency)
             throws CurrenciesWSException {
         // TODO Auto-generated method stub
         return null;
