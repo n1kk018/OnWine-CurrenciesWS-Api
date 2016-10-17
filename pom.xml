@@ -51,21 +51,6 @@
         <scope>provided</scope><!-- fournit par les autres librairies de jboss -->
     </dependency>
     <dependency>
-    	<groupId>com.sun.jersey</groupId>
-	    <artifactId>jersey-server</artifactId>
-	    <version>${jersey.version}</version>
-	</dependency>
-    <dependency>
-        <groupId>com.fasterxml.jackson.core</groupId>
-        <artifactId>jackson-core</artifactId>
-        <version>${jackson.version}</version>
-    </dependency>
-    <dependency>
-        <groupId>com.fasterxml.jackson.jaxrs</groupId>
-        <artifactId>jackson-jaxrs-json-provider</artifactId>
-        <version>${jackson.json.version}</version>
-    </dependency>
-    <dependency>
   		<groupId>junit</groupId>
   		<artifactId>junit</artifactId>
   		<version>${junit.version}</version>

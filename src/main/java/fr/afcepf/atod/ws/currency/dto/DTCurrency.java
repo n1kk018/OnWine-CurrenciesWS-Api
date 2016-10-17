@@ -1,17 +1,22 @@
 package fr.afcepf.atod.ws.currency.dto;
 
 import java.io.Serializable;
+
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlRootElement;
 /**
  * Data Transfer Object of the currency Entity.
  * @author nikko
  *
  */
+@XmlRootElement(name = "Currency")
+@XmlAccessorType(XmlAccessType.FIELD)
 public class DTCurrency implements Serializable {
-
     /**
-     * Serialization ID.
+     * Serialization Id.
      */
-    private static final long serialVersionUID = -3255475366427129373L;
+    private static final long serialVersionUID = -1843854780599673466L;
     /**
      * unique identifier of the DTcurrency.
      */
