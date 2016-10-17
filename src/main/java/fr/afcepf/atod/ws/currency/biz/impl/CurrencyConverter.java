@@ -48,4 +48,11 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
                 c.getCode(),
                 c.getRate());
     }
+    @Override
+    public Double convert(Double paramAmount, String paramSrcCurrency, String paramTrgtCurrency)
+            throws CurrenciesWSException {
+        Currency srcCurrency = dao.findByCode(paramSrcCurrency);
+        Currency trgtCurrency = dao.findByCode(paramTrgtCurrency);
+        return paramAmount * srcCurrency.getRate() - trgtCurrency.getRate();
+    }
 }

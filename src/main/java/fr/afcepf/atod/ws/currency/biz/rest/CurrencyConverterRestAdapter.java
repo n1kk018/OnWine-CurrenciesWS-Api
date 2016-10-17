@@ -6,7 +6,9 @@ import java.util.List;
 
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import fr.afcepf.atod.ws.currency.biz.api.ICurrencyConverter;
@@ -56,5 +58,14 @@ public class CurrencyConverterRestAdapter
                 c.getName(),
                 c.getCode(),
                 c.getRate());
+    }
+    @POST
+    @Consumes("application/json")
+    @Path("/convert/{paramAmount}/{paramSrcCurrency}/{paramTrgtCurrency}")
+    @Override
+    public Double convert(Double paramAmount, String paramSrcCurrency, String paramTrgtCurrency)
+            throws CurrenciesWSException {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

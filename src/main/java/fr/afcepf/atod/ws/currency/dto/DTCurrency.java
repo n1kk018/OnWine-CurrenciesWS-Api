@@ -10,7 +10,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author nikko
  *
  */
-@XmlRootElement(name = "Currency")
+@XmlRootElement()
 @XmlAccessorType(XmlAccessType.FIELD)
 public class DTCurrency implements Serializable {
     /**
