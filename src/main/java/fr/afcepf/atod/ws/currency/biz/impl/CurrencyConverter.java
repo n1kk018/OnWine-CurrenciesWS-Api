@@ -30,6 +30,14 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
      */
     @EJB
     private ICurrencyDao dao;
+    /**
+     * Source currency.
+     */
+    private Currency srcCurrency;
+    /**
+     * Target currency.
+     */
+    private Currency trgtCurrency;
     @Override
     public List<DTCurrency> getAllCurrencies() throws CurrenciesWSException {
         List<DTCurrency> listDTO  = new ArrayList<DTCurrency>();
@@ -54,8 +62,34 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
             String paramSrcCurrency,
             String paramTrgtCurrency)
             throws CurrenciesWSException {
-        Currency srcCurrency = dao.findByCode(paramSrcCurrency);
-        Currency trgtCurrency = dao.findByCode(paramTrgtCurrency);
-        return paramAmount * srcCurrency.getRate() - trgtCurrency.getRate();
+        srcCurrency = dao.findByCode(paramSrcCurrency);
+        trgtCurrency = dao.findByCode(paramTrgtCurrency);
+        Double amountInDollar = paramAmount * srcCurrency.getRate();
+        return amountInDollar * trgtCurrency.getRate();
     }
+    /**
+     * @return the srcCurrency
+     */
+    public Currency getSrcCurrency() {
+        return srcCurrency;
+    }
+    /**
+     * @param paramSrcCurrency the srcCurrency to set
+     */
+    public void setSrcCurrency(Currency paramSrcCurrency) {
+        srcCurrency = paramSrcCurrency;
+    }
+    /**
+     * @return the trgtCurrency
+     */
+    public Currency getTrgtCurrency() {
+        return trgtCurrency;
+    }
+    /**
+     * @param paramTrgtCurrency the trgtCurrency to set
+     */
+    public void setTrgtCurrency(Currency paramTrgtCurrency) {
+        trgtCurrency = paramTrgtCurrency;
+    }
+    
 }
