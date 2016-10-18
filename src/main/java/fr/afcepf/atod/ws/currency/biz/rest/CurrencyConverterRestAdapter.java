@@ -25,7 +25,7 @@ import fr.afcepf.atod.ws.currency.exception.CurrenciesWSException;
  */
 @Stateless
 @Path("/currenciesConverter")
-@Produces("application/json")
+@Produces(MediaType.APPLICATION_JSON)
 public class CurrencyConverterRestAdapter
     implements ICurrencyConverter, Serializable {
     /**

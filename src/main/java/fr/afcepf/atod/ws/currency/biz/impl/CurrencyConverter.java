@@ -1,12 +1,16 @@
 package fr.afcepf.atod.ws.currency.biz.impl;
-
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
+import org.json.JSONObject;
 import fr.afcepf.atod.ws.currency.biz.api.ICurrencyConverter;
+import fr.afcepf.atod.ws.currency.client.RestClient;
 import fr.afcepf.atod.ws.currency.dao.api.ICurrencyDao;
 import fr.afcepf.atod.ws.currency.dto.DTCurrency;
 import fr.afcepf.atod.ws.currency.entity.Currency;
@@ -25,6 +29,14 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
      * Serialization ID.
      */
     private static final long serialVersionUID = -3023413234131773165L;
+    /**
+     * millisecond multiplier for unix timestamps conversion.
+     */
+    private static final long MILLIS = 1000L;
+    /**
+     * Used to remove a day on a date via calendar object.
+     */
+    private static final int MOINSUNJOUR = -24;
     /**
      * injected currency dao.
      */
@@ -55,7 +67,48 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
             String paramTrgtCurrency)
             throws CurrenciesWSException {
         Currency srcCurrency = dao.findByCode(paramSrcCurrency);
+        if (srcCurrency != null) {
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(srcCurrency.getUpdatedAt());
+            cal.add(Calendar.HOUR, MOINSUNJOUR);
+            if (srcCurrency.getUpdatedAt().before(cal.getTime())) {
+                updateDB();
+            }
+        }
         Currency trgtCurrency = dao.findByCode(paramTrgtCurrency);
         return paramAmount * srcCurrency.getRate() - trgtCurrency.getRate();
+    }
+    /**
+     * Update of the rates once a day via REST ws.
+     */
+    private void updateDB() {
+        try {
+            RestClient updater = new RestClient();
+            JSONObject currencies = new JSONObject(updater.getCurrencies());
+            JSONObject mainObj = new JSONObject(updater.getLatestRates());
+            JSONObject rates = mainObj.getJSONObject("rates");
+            for (Iterator<String> iterator = rates.keys();
+                    iterator.hasNext();) {
+                Currency c = null;
+                String key = (String) iterator.next();
+                c = dao.findByCode(key);
+                if (c == null) {
+                    c = new Currency(null,
+                        currencies.getString(key),
+                        key,
+                        rates.getDouble(key));
+                    dao.insert(c);
+                } else {
+                    c.setName(currencies.getString(key));
+                    c.setCode(key);
+                    c.setRate(rates.getDouble(key));
+                    c.setUpdatedAt(new Date(mainObj.getLong("timestamp")
+                            * MILLIS));
+                    dao.update(c);
+                }
+            }
+        } catch (CurrenciesWSException paramE) {
+            paramE.printStackTrace();
+        }
     }
 }
