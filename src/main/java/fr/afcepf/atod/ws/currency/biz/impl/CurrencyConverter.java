@@ -18,7 +18,8 @@ import fr.afcepf.atod.ws.currency.exception.CurrenciesWSException;
  */
 @Stateless
 @WebService(endpointInterface = "fr.afcepf.atod."
-        + "ws.currency.biz.api.ICurrencyConverter")
+        + "ws.currency.biz.api.ICurrencyConverter",
+        targetNamespace = "http://impl.biz.currency.ws.atod.afcepf.fr/")
 public class CurrencyConverter implements ICurrencyConverter, Serializable {
     /**
      * Serialization ID.

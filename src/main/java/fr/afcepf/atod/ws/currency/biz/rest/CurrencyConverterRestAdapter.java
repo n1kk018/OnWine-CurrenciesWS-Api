@@ -11,6 +11,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
 import fr.afcepf.atod.ws.currency.biz.api.ICurrencyConverter;
 import fr.afcepf.atod.ws.currency.dao.api.ICurrencyDao;
 import fr.afcepf.atod.ws.currency.dto.DTCurrency;
@@ -59,15 +61,16 @@ public class CurrencyConverterRestAdapter
                 c.getCode(),
                 c.getRate());
     }
-    @POST
-    @Consumes("application/json")
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
     @Path("/convert/{paramAmount}/{paramSrcCurrency}/{paramTrgtCurrency}")
     @Override
     public Double convert(Double paramAmount,
             String paramSrcCurrency,
             String paramTrgtCurrency)
             throws CurrenciesWSException {
-        // TODO Auto-generated method stub
-        return null;
+        Currency srcCurrency = dao.findByCode(paramSrcCurrency);
+        Currency trgtCurrency = dao.findByCode(paramTrgtCurrency);
+        return paramAmount * srcCurrency.getRate() - trgtCurrency.getRate();
     }
 }
