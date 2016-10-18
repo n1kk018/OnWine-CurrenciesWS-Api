@@ -38,6 +38,14 @@ public class CurrencyConverterRestAdapter
     @EJB
     private ICurrencyDao dao;
     /**
+     * Source currency.
+     */
+    private Currency srcCurrency;
+    /**
+     * Target currency.
+     */
+    private Currency trgtCurrency;
+    /**
      * test.
      */
     @GET
@@ -69,8 +77,32 @@ public class CurrencyConverterRestAdapter
             String paramSrcCurrency,
             String paramTrgtCurrency)
             throws CurrenciesWSException {
-        Currency srcCurrency = dao.findByCode(paramSrcCurrency);
-        Currency trgtCurrency = dao.findByCode(paramTrgtCurrency);
+        srcCurrency = dao.findByCode(paramSrcCurrency);
+        trgtCurrency = dao.findByCode(paramTrgtCurrency);
         return paramAmount * srcCurrency.getRate() - trgtCurrency.getRate();
+    }
+    /**
+     * @return the srcCurrency
+     */
+    public Currency getSrcCurrency() {
+        return srcCurrency;
+    }
+    /**
+     * @param paramSrcCurrency the srcCurrency to set
+     */
+    public void setSrcCurrency(Currency paramSrcCurrency) {
+        srcCurrency = paramSrcCurrency;
+    }
+    /**
+     * @return the trgtCurrency
+     */
+    public Currency getTrgtCurrency() {
+        return trgtCurrency;
+    }
+    /**
+     * @param paramTrgtCurrency the trgtCurrency to set
+     */
+    public void setTrgtCurrency(Currency paramTrgtCurrency) {
+        trgtCurrency = paramTrgtCurrency;
     }
 }

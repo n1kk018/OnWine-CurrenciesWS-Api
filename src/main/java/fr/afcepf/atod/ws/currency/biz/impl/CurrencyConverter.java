@@ -42,6 +42,14 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
      */
     @EJB
     private ICurrencyDao dao;
+    /**
+     * Source currency.
+     */
+    private Currency srcCurrency;
+    /**
+     * Target currency.
+     */
+    private Currency trgtCurrency;
     @Override
     public List<DTCurrency> getAllCurrencies() throws CurrenciesWSException {
         List<DTCurrency> listDTO  = new ArrayList<DTCurrency>();
@@ -66,7 +74,7 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
             String paramSrcCurrency,
             String paramTrgtCurrency)
             throws CurrenciesWSException {
-        Currency srcCurrency = dao.findByCode(paramSrcCurrency);
+        srcCurrency = dao.findByCode(paramSrcCurrency);
         if (srcCurrency != null) {
             Calendar cal = Calendar.getInstance();
             cal.setTime(srcCurrency.getUpdatedAt());
@@ -75,10 +83,10 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
                 updateDB();
             }
         }
-        Currency trgtCurrency = dao.findByCode(paramTrgtCurrency);
+        trgtCurrency = dao.findByCode(paramTrgtCurrency);
         return paramAmount * srcCurrency.getRate() - trgtCurrency.getRate();
     }
-    /**
+     /**
      * Update of the rates once a day via REST ws.
      */
     private void updateDB() {
@@ -110,5 +118,29 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
         } catch (CurrenciesWSException paramE) {
             paramE.printStackTrace();
         }
+    }
+    /**
+     * @return the srcCurrency
+     */
+    public Currency getSrcCurrency() {
+        return srcCurrency;
+    }
+    /**
+     * @param paramSrcCurrency the srcCurrency to set
+     */
+    public void setSrcCurrency(Currency paramSrcCurrency) {
+        srcCurrency = paramSrcCurrency;
+    }
+    /**
+     * @return the trgtCurrency
+     */
+    public Currency getTrgtCurrency() {
+        return trgtCurrency;
+    }
+    /**
+     * @param paramTrgtCurrency the trgtCurrency to set
+     */
+    public void setTrgtCurrency(Currency paramTrgtCurrency) {
+        trgtCurrency = paramTrgtCurrency;
     }
 }
