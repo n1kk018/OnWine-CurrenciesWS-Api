@@ -94,7 +94,7 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
             srcCurrency = dao.findByCode(paramSrcCurrency);
             trgtCurrency = dao.findByCode(paramTrgtCurrency);
         } catch (CurrenciesWSException e) {
-            createDB();
+            updateDB();
             try {
                 srcCurrency = dao.findByCode(paramSrcCurrency);
                 trgtCurrency = dao.findByCode(paramTrgtCurrency);
@@ -159,12 +159,16 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
                     c = dao.findByCode(key);
                 } catch (CurrenciesWSException e) { }
                 if (c == null) {
+                    log.info("=============================");
+                    log.info("chuila1");
                     c = new Currency(null,
                         currencies.getString(key),
                         key,
                         rates.getDouble(key));
                     dao.insert(c);
                 } else {
+                    log.info("=============================");
+                    log.info("chuila2");
                     c.setName(currencies.getString(key));
                     c.setCode(key);
                     c.setRate(rates.getDouble(key));
