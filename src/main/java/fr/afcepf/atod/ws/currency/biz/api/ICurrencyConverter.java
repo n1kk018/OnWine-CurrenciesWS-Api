@@ -14,7 +14,7 @@ import fr.afcepf.atod.ws.currency.exception.CurrenciesWSException;
  *
  */
 @Remote
-@WebService
+@WebService(targetNamespace = "http://soap.currency.ws.atod.afcepf.fr/")
 public interface ICurrencyConverter {
     /**
      * Get the complete list of {@link DTCurrency} availables.

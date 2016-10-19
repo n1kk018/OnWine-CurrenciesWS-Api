@@ -104,4 +104,11 @@ public class CurrencyConverterRestAdapter
     public void setTrgtCurrency(Currency paramTrgtCurrency) {
         trgtCurrency = paramTrgtCurrency;
     }
+    /**
+     * @param paramDao the dao to set
+     */
+    public void setDao(ICurrencyDao paramDao) {
+        dao = paramDao;
+    }
+    
 }

@@ -46,7 +46,7 @@ public class TestCurrencyConverter {
     /**
      * Expected amount.
      */
-    private static final Double EXPECTED_AMOUNT = 8.926741696404063;
+    private static final Double EXPECTED_AMOUNT = 8.929145618273667;
     /**
      * Api where is located the service.
      */
@@ -67,8 +67,7 @@ public class TestCurrencyConverter {
         EasyMock.expect(mockCurrencyDao.findByCode("GBP")).andReturn(currencyGBP);
         EasyMock.expect(mockCurrencyDao.findByCode("EUR")).andReturn(currencyEUR);
         EasyMock.replay(mockCurrencyDao);
-        ((CurrencyConverter) bu).setSrcCurrency(currencyEUR);
-        ((CurrencyConverter) bu).setTrgtCurrency(currencyGBP);
+        ((CurrencyConverter) bu).setDao(mockCurrencyDao);
     }
     /**
      * Aprés tous les tests.

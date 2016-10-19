@@ -28,7 +28,7 @@ import fr.afcepf.atod.ws.currency.exception.CurrenciesWSException;
 @Stateless
 @WebService(endpointInterface = "fr.afcepf.atod."
         + "ws.currency.biz.api.ICurrencyConverter",
-        targetNamespace = "http://impl.biz.currency.ws.atod.afcepf.fr/")
+        targetNamespace = "http://soap.currency.ws.atod.afcepf.fr/")
 public class CurrencyConverter implements ICurrencyConverter, Serializable {
     /**
      * un logger.
@@ -159,16 +159,12 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
                     c = dao.findByCode(key);
                 } catch (CurrenciesWSException e) { }
                 if (c == null) {
-                    log.info("=============================");
-                    log.info("chuila1");
                     c = new Currency(null,
                         currencies.getString(key),
                         key,
                         rates.getDouble(key));
                     dao.insert(c);
                 } else {
-                    log.info("=============================");
-                    log.info("chuila2");
                     c.setName(currencies.getString(key));
                     c.setCode(key);
                     c.setRate(rates.getDouble(key));
@@ -205,5 +201,8 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
      */
     public void setTrgtCurrency(Currency paramTrgtCurrency) {
         trgtCurrency = paramTrgtCurrency;
+    }
+    public void setDao(ICurrencyDao paramDao) {
+        dao = paramDao;
     }
 }
