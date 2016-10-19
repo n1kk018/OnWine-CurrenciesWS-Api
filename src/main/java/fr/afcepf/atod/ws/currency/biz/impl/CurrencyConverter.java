@@ -3,11 +3,16 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 import java.util.Iterator;
 import java.util.List;
+import java.util.TimeZone;
+
 import javax.ejb.EJB;
 import javax.ejb.Stateless;
 import javax.jws.WebService;
+
+import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import fr.afcepf.atod.ws.currency.biz.api.ICurrencyConverter;
 import fr.afcepf.atod.ws.currency.client.RestClient;
@@ -25,6 +30,10 @@ import fr.afcepf.atod.ws.currency.exception.CurrenciesWSException;
         + "ws.currency.biz.api.ICurrencyConverter",
         targetNamespace = "http://impl.biz.currency.ws.atod.afcepf.fr/")
 public class CurrencyConverter implements ICurrencyConverter, Serializable {
+    /**
+     * un logger.
+     */
+    private static Logger log = Logger.getLogger(CurrencyConverter.class);
     /**
      * Serialization ID.
      */
@@ -53,8 +62,15 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
     @Override
     public List<DTCurrency> getAllCurrencies() throws CurrenciesWSException {
         List<DTCurrency> listDTO  = new ArrayList<DTCurrency>();
-        for (Currency  c : dao.findAll()) {
-            listDTO.add(entityDevise2DeviseDTO(c));
+        try {
+            for (Currency  c : dao.findAll()) {
+                listDTO.add(entityDevise2DeviseDTO(c));
+            }
+        } catch (CurrenciesWSException paramE) {
+            createDB();
+            for (Currency  c : dao.findAll()) {
+                listDTO.add(entityDevise2DeviseDTO(c));
+            }
         }
         return listDTO;
     }
@@ -74,22 +90,37 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
             String paramSrcCurrency,
             String paramTrgtCurrency)
             throws CurrenciesWSException {
-        srcCurrency = dao.findByCode(paramSrcCurrency);
-        if (srcCurrency != null) {
-            Calendar cal = Calendar.getInstance();
-            cal.setTime(srcCurrency.getUpdatedAt());
-            cal.add(Calendar.HOUR, MOINSUNJOUR);
-            if (srcCurrency.getUpdatedAt().before(cal.getTime())) {
-                updateDB();
+        try {
+            srcCurrency = dao.findByCode(paramSrcCurrency);
+            trgtCurrency = dao.findByCode(paramTrgtCurrency);
+        } catch (CurrenciesWSException e) {
+            createDB();
+            try {
+                srcCurrency = dao.findByCode(paramSrcCurrency);
+                trgtCurrency = dao.findByCode(paramTrgtCurrency);
+            } catch (Exception paramE) {
+                throw new CurrenciesWSException("Devise non référencée!");
             }
         }
-        trgtCurrency = dao.findByCode(paramTrgtCurrency);
-        return paramAmount * srcCurrency.getRate() - trgtCurrency.getRate();
+        Calendar cal = new GregorianCalendar(
+                TimeZone.getTimeZone("Europe/Paris"));
+        cal.setTime(new Date());
+        cal.add(Calendar.DATE, -1);
+        log.info("======================================");
+        log.info(cal.getTime());
+        log.info(srcCurrency.getUpdatedAt());
+        log.info(cal.getTime().after(srcCurrency.getUpdatedAt()));
+        if (cal.getTime().after(srcCurrency.getUpdatedAt())) {
+            updateDB();
+        }
+        Double amountInDollar = paramAmount / srcCurrency.getRate();
+        return  amountInDollar * trgtCurrency.getRate();
     }
-     /**
-     * Update of the rates once a day via REST ws.
+    /**
+     * Initial create of the rates via REST ws.
+     * @throws CurrenciesWSException custom exception
      */
-    private void updateDB() {
+    private void createDB() throws CurrenciesWSException {
         try {
             RestClient updater = new RestClient();
             JSONObject currencies = new JSONObject(updater.getCurrencies());
@@ -99,7 +130,34 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
                     iterator.hasNext();) {
                 Currency c = null;
                 String key = (String) iterator.next();
-                c = dao.findByCode(key);
+                c = new Currency(null,
+                    currencies.getString(key),
+                    key,
+                    rates.getDouble(key));
+                dao.insert(c);
+            }
+        } catch (CurrenciesWSException paramE) {
+            throw new CurrenciesWSException(paramE.getMessage(),
+                    paramE.getWsError());
+        }
+    }
+     /**
+     * Update of the rates once a day via REST ws.
+     * @throws CurrenciesWSException custom exception
+     */
+    private void updateDB() throws CurrenciesWSException {
+        try {
+            RestClient updater = new RestClient();
+            JSONObject currencies = new JSONObject(updater.getCurrencies());
+            JSONObject mainObj = new JSONObject(updater.getLatestRates());
+            JSONObject rates = mainObj.getJSONObject("rates");
+            for (Iterator<String> iterator = rates.keys();
+                    iterator.hasNext();) {
+                Currency c = null;
+                String key = (String) iterator.next();
+                try {
+                    c = dao.findByCode(key);
+                } catch (CurrenciesWSException e) { }
                 if (c == null) {
                     c = new Currency(null,
                         currencies.getString(key),
@@ -116,7 +174,8 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
                 }
             }
         } catch (CurrenciesWSException paramE) {
-            paramE.printStackTrace();
+            throw new CurrenciesWSException(paramE.getMessage(),
+                    paramE.getWsError());
         }
     }
     /**
