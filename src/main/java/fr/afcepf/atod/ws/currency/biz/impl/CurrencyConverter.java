@@ -128,10 +128,11 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
         if (cal.getTime().after(srcCurrency.getUpdatedAt())) {
             updateDB();
         }
-        DecimalFormat df = new DecimalFormat("########.00");  
+        DecimalFormat df = new DecimalFormat("########.00");
         Double result = (paramAmount / srcCurrency.getRate())
                 * trgtCurrency.getRate();
-        return result;
+        String strDouble = df.format(result);
+        return Double.parseDouble(strDouble.replace(",", "."));
     }
     @Override
     public Wrapper convertAndFormat(Double paramAmount,
