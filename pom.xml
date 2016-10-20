@@ -77,13 +77,11 @@
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId><!-- indirectly httpcore -->
         <version>${htpclient.version}</version>
-        <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>org.json</groupId>
         <artifactId>json</artifactId>
         <version>20160810</version>
-        <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>

@@ -62,10 +62,6 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
      */
     private static final long MILLIS = 1000L;
     /**
-     * Used to remove a day on a date via calendar object.
-     */
-    private static final int MOINSUNJOUR = -24;
-    /**
      * injected currency dao.
      */
     @EJB
@@ -132,8 +128,17 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
         if (cal.getTime().after(srcCurrency.getUpdatedAt())) {
             updateDB();
         }
-        Double amountInDollar = paramAmount / srcCurrency.getRate();
-        return  amountInDollar * trgtCurrency.getRate();
+        DecimalFormat df = new DecimalFormat("########.00");  
+        Double result = (paramAmount / srcCurrency.getRate())
+                * trgtCurrency.getRate();
+        return result;
+    }
+    @Override
+    public Wrapper convertAndFormat(Double paramAmount,
+            String paramSrcCurrency,
+            String paramTrgtCurrency)
+            throws CurrenciesWSException {
+       return null;
     }
     /**
      * Initial create of the rates via REST ws.
@@ -226,14 +231,5 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
      */
     public void setDao(ICurrencyDao paramDao) {
         dao = paramDao;
-    }
-    @Override
-    public Wrapper convertAndFormat(Double paramAmount, String paramSrcCurrency, String paramTrgtCurrency)
-            throws CurrenciesWSException {
-        srcCurrency = dao.findByCode(paramSrcCurrency);
-        trgtCurrency = dao.findByCode(paramTrgtCurrency);
-        DecimalFormat df = new DecimalFormat("########.00");  
-        Double result = (paramAmount / srcCurrency.getRate()) * trgtCurrency.getRate();
-        return new Wrapper();
     }
 }
