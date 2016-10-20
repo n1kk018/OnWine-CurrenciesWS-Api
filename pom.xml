@@ -62,24 +62,28 @@
   		<scope>test</scope>
   	</dependency>
   	<dependency>
-	    <groupId>org.jboss.resteasy</groupId>
-	    <artifactId>resteasy-jaxrs</artifactId>
-	    <version>${resteasy.version}</version>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-jaxrs</artifactId>
+        <version>${resteasy.version}</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
-	    <groupId>org.jboss.resteasy</groupId>
-	    <artifactId>resteasy-jackson-provider</artifactId>
-	    <version>${resteasy.version}</version>
-	</dependency>
+        <groupId>org.jboss.resteasy</groupId>
+        <artifactId>resteasy-jackson-provider</artifactId>
+        <version>${resteasy.version}</version>
+        <scope>provided</scope>
+    </dependency>
 	<dependency>
         <groupId>org.apache.httpcomponents</groupId>
         <artifactId>httpclient</artifactId><!-- indirectly httpcore -->
         <version>${htpclient.version}</version>
+        <scope>provided</scope>
     </dependency>
     <dependency>
         <groupId>org.json</groupId>
         <artifactId>json</artifactId>
         <version>20160810</version>
+        <scope>provided</scope>
     </dependency>
   </dependencies>
   <build>

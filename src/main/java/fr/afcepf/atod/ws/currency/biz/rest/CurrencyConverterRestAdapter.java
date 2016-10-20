@@ -1,7 +1,9 @@
 package fr.afcepf.atod.ws.currency.biz.rest;
 
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -10,7 +12,10 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
+
+import org.apache.log4j.Logger;
 
 import fr.afcepf.atod.ws.currency.biz.api.ICurrencyConverter;
 import fr.afcepf.atod.ws.currency.dao.api.ICurrencyDao;
@@ -23,10 +28,26 @@ import fr.afcepf.atod.ws.currency.exception.CurrenciesWSException;
  *
  */
 @Stateless
-@Path("/currenciesConverter")
+@Path("/converter")
 @Produces(MediaType.APPLICATION_JSON)
 public class CurrencyConverterRestAdapter
     implements ICurrencyConverter, Serializable {
+    static {
+        REFCURRENCYMAP.put("EUR", "flaticon-euro-currency-symbol");
+        REFCURRENCYMAP.put("GBP", "flaticon-pound-symbol-variant");
+        REFCURRENCYMAP.put("USD", "flaticon-dollar-currency-symbol-2");
+        REFCURRENCYMAP.put("JPY", "flaticon-yen-currency-symbol");
+        REFCURRENCYMAP.put("BGN", "flaticon-bulgaria-lev");
+        REFCURRENCYMAP.put("DKK", "flaticon-denmark-krone-currency-symbol");
+        REFCURRENCYMAP.put("EEK", "flaticon-estonia-kroon-currency-symbol");
+        REFCURRENCYMAP.put("HUF", "flaticon-hungary-forint-currency-symbol");
+        REFCURRENCYMAP.put("LVL", "flaticon-latvia-lat");
+        REFCURRENCYMAP.put("LTL", "flaticon-lithuania-litas-currency-symbol");
+        REFCURRENCYMAP.put("PLN", "flaticon-poland-zloty-currency-symbol");
+        REFCURRENCYMAP.put("CZK", "flaticon-czech-republic-koruna-currency-symbol");
+        REFCURRENCYMAP.put("SKK", "flaticon-denmark-krone-currency-symbol");
+        REFCURRENCYMAP.put("SEK", "flaticon-sweden-krona-currency-symbol");
+    }
     /**
      * serialization ID.
      */
@@ -44,11 +65,13 @@ public class CurrencyConverterRestAdapter
      * Target currency.
      */
     private Currency trgtCurrency;
+    
+    private final static Logger log = Logger.getLogger( RESTCorsDemoRequestFilter.class.getName() );
     /**
      * test.
      */
     @GET
-    @Path("/listAllCurrencies")
+    @Path("/listAll")
     @Override
     public List<DTCurrency> getAllCurrencies() throws CurrenciesWSException {
         List<DTCurrency> listDTO  = new ArrayList<DTCurrency>();
@@ -70,15 +93,44 @@ public class CurrencyConverterRestAdapter
     }
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
-    @Path("/convert/{paramAmount}/{paramSrcCurrency}/{paramTrgtCurrency}")
+    @Path("/convert")
     @Override
-    public Double convert(Double paramAmount,
-            String paramSrcCurrency,
-            String paramTrgtCurrency)
+    public Double convert(@QueryParam("amount") Double paramAmount,
+            @QueryParam("src") String paramSrcCurrency,
+            @QueryParam("trgt") String paramTrgtCurrency)
             throws CurrenciesWSException {
+        log.info("====================================================");
+        log.info(paramSrcCurrency);
         srcCurrency = dao.findByCode(paramSrcCurrency);
         trgtCurrency = dao.findByCode(paramTrgtCurrency);
-        return paramAmount * srcCurrency.getRate() - trgtCurrency.getRate();
+        Double amountInDollar = paramAmount / srcCurrency.getRate();
+        return  amountInDollar * trgtCurrency.getRate();
+    }
+    /**
+     * Version formatté que pour le REST.
+     * @param paramAmount
+     * @param paramSrcCurrency
+     * @param paramTrgtCurrency
+     * @return 
+     * @throws CurrenciesWSException
+     */
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Path("/convertAndFormat")
+    @Produces(MediaType.TEXT_PLAIN)
+    @Override
+    public String convertAndFormat(@QueryParam("amount") Double paramAmount,
+            @QueryParam("src") String paramSrcCurrency,
+            @QueryParam("trgt") String paramTrgtCurrency)
+            throws CurrenciesWSException {
+        log.info("====================================================");
+        log.info(paramSrcCurrency);
+        srcCurrency = dao.findByCode(paramSrcCurrency);
+        trgtCurrency = dao.findByCode(paramTrgtCurrency);
+        DecimalFormat df = new DecimalFormat("########.00");  
+        Double result = (paramAmount / srcCurrency.getRate()) * trgtCurrency.getRate();
+        return df.format(result).replace(".", ",")
+                + " <span class='" + REFCURRENCYMAP.get(paramTrgtCurrency)+"'></span>";
     }
     /**
      * @return the srcCurrency
@@ -110,5 +162,4 @@ public class CurrencyConverterRestAdapter
     public void setDao(ICurrencyDao paramDao) {
         dao = paramDao;
     }
-    
 }

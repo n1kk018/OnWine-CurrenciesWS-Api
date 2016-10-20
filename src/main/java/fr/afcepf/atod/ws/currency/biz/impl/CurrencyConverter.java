@@ -1,9 +1,11 @@
 package fr.afcepf.atod.ws.currency.biz.impl;
 import java.io.Serializable;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
@@ -30,6 +32,22 @@ import fr.afcepf.atod.ws.currency.exception.CurrenciesWSException;
         + "ws.currency.biz.api.ICurrencyConverter",
         targetNamespace = "http://soap.currency.ws.atod.afcepf.fr/")
 public class CurrencyConverter implements ICurrencyConverter, Serializable {
+    static {
+        REFCURRENCYMAP.put("EUR", "flaticon-euro-currency-symbol");
+        REFCURRENCYMAP.put("GBP", "flaticon-pound-symbol-variant");
+        REFCURRENCYMAP.put("USD", "flaticon-dollar-currency-symbol-2");
+        REFCURRENCYMAP.put("JPY", "flaticon-yen-currency-symbol");
+        REFCURRENCYMAP.put("BGN", "flaticon-bulgaria-lev");
+        REFCURRENCYMAP.put("DKK", "flaticon-denmark-krone-currency-symbol");
+        REFCURRENCYMAP.put("EEK", "flaticon-estonia-kroon-currency-symbol");
+        REFCURRENCYMAP.put("HUF", "flaticon-hungary-forint-currency-symbol");
+        REFCURRENCYMAP.put("LVL", "flaticon-latvia-lat");
+        REFCURRENCYMAP.put("LTL", "flaticon-lithuania-litas-currency-symbol");
+        REFCURRENCYMAP.put("PLN", "flaticon-poland-zloty-currency-symbol");
+        REFCURRENCYMAP.put("CZK", "flaticon-czech-republic-koruna-currency-symbol");
+        REFCURRENCYMAP.put("SKK", "flaticon-denmark-krone-currency-symbol");
+        REFCURRENCYMAP.put("SEK", "flaticon-sweden-krona-currency-symbol");
+    }
     /**
      * un logger.
      */
@@ -202,7 +220,19 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
     public void setTrgtCurrency(Currency paramTrgtCurrency) {
         trgtCurrency = paramTrgtCurrency;
     }
+    /**
+     * @param paramDao the dao to set
+     */
     public void setDao(ICurrencyDao paramDao) {
         dao = paramDao;
+    }
+    @Override
+    public String convertAndFormat(Double paramAmount, String paramSrcCurrency, String paramTrgtCurrency)
+            throws CurrenciesWSException {
+        srcCurrency = dao.findByCode(paramSrcCurrency);
+        trgtCurrency = dao.findByCode(paramTrgtCurrency);
+        DecimalFormat df = new DecimalFormat("########.00");  
+        Double result = (paramAmount / srcCurrency.getRate()) * trgtCurrency.getRate();
+        return df.format(result).replace(".", ",");
     }
 }
