@@ -17,6 +17,7 @@ import javax.jws.WebService;
 import org.apache.log4j.Logger;
 import org.json.JSONObject;
 import fr.afcepf.atod.ws.currency.biz.api.ICurrencyConverter;
+import fr.afcepf.atod.ws.currency.biz.rest.Wrapper;
 import fr.afcepf.atod.ws.currency.client.RestClient;
 import fr.afcepf.atod.ws.currency.dao.api.ICurrencyDao;
 import fr.afcepf.atod.ws.currency.dto.DTCurrency;
@@ -227,12 +228,12 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
         dao = paramDao;
     }
     @Override
-    public String convertAndFormat(Double paramAmount, String paramSrcCurrency, String paramTrgtCurrency)
+    public Wrapper convertAndFormat(Double paramAmount, String paramSrcCurrency, String paramTrgtCurrency)
             throws CurrenciesWSException {
         srcCurrency = dao.findByCode(paramSrcCurrency);
         trgtCurrency = dao.findByCode(paramTrgtCurrency);
         DecimalFormat df = new DecimalFormat("########.00");  
         Double result = (paramAmount / srcCurrency.getRate()) * trgtCurrency.getRate();
-        return df.format(result).replace(".", ",");
+        return new Wrapper();
     }
 }

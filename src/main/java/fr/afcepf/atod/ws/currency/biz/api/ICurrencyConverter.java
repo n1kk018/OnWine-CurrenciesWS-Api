@@ -7,6 +7,7 @@ import javax.ejb.Remote;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 
+import fr.afcepf.atod.ws.currency.biz.rest.Wrapper;
 import fr.afcepf.atod.ws.currency.dto.DTCurrency;
 import fr.afcepf.atod.ws.currency.exception.CurrenciesWSException;
 /**
@@ -48,7 +49,7 @@ public interface ICurrencyConverter {
      * @throws CurrenciesWSException custom exception
      * @return Double converted amount
      */
-    String convertAndFormat(@WebParam(name = "amount") Double paramAmount,
+    Wrapper convertAndFormat(@WebParam(name = "amount") Double paramAmount,
             @WebParam(name = "src") String paramSrcCurrency,
             @WebParam(name = "trgt") String paramTrgtCurrency)
                     throws CurrenciesWSException;

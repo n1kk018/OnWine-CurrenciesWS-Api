@@ -117,9 +117,8 @@ public class CurrencyConverterRestAdapter
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Path("/convertAndFormat")
-    @Produces(MediaType.TEXT_PLAIN)
     @Override
-    public String convertAndFormat(@QueryParam("amount") Double paramAmount,
+    public Wrapper convertAndFormat(@QueryParam("amount") Double paramAmount,
             @QueryParam("src") String paramSrcCurrency,
             @QueryParam("trgt") String paramTrgtCurrency)
             throws CurrenciesWSException {
@@ -128,9 +127,12 @@ public class CurrencyConverterRestAdapter
         srcCurrency = dao.findByCode(paramSrcCurrency);
         trgtCurrency = dao.findByCode(paramTrgtCurrency);
         DecimalFormat df = new DecimalFormat("########.00");  
-        Double result = (paramAmount / srcCurrency.getRate()) * trgtCurrency.getRate();
-        return df.format(result).replace(".", ",")
-                + " <span class='" + REFCURRENCYMAP.get(paramTrgtCurrency)+"'></span>";
+        Double result = (paramAmount / srcCurrency.getRate())
+                * trgtCurrency.getRate();
+        Wrapper o =new Wrapper();
+        o.amount=df.format(result).replace(".", ",");
+        o.currency_class=REFCURRENCYMAP.get(paramTrgtCurrency);
+        return o;
     }
     /**
      * @return the srcCurrency
