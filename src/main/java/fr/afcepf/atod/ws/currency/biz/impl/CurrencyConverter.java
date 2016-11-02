@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.GregorianCalendar;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.TimeZone;
@@ -106,10 +105,13 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
             String paramTrgtCurrency)
             throws CurrenciesWSException {
         try {
+            log.info(paramAmount);
+            log.info(paramSrcCurrency);
+            log.info(paramTrgtCurrency);
             srcCurrency = dao.findByCode(paramSrcCurrency);
             trgtCurrency = dao.findByCode(paramTrgtCurrency);
         } catch (CurrenciesWSException e) {
-            updateDB();
+            //updateDB();
             try {
                 srcCurrency = dao.findByCode(paramSrcCurrency);
                 trgtCurrency = dao.findByCode(paramTrgtCurrency);
@@ -121,12 +123,8 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
                 TimeZone.getTimeZone("Europe/Paris"));
         cal.setTime(new Date());
         cal.add(Calendar.DATE, -1);
-        log.info("======================================");
-        log.info(cal.getTime());
-        log.info(srcCurrency.getUpdatedAt());
-        log.info(cal.getTime().after(srcCurrency.getUpdatedAt()));
         if (cal.getTime().after(srcCurrency.getUpdatedAt())) {
-            updateDB();
+            //updateDB();
         }
         DecimalFormat df = new DecimalFormat("########.00");
         Double result = (paramAmount / srcCurrency.getRate())
@@ -170,6 +168,7 @@ public class CurrencyConverter implements ICurrencyConverter, Serializable {
      * Update of the rates once a day via REST ws.
      * @throws CurrenciesWSException custom exception
      */
+    @SuppressWarnings("unused")
     private void updateDB() throws CurrenciesWSException {
         try {
             RestClient updater = new RestClient();
